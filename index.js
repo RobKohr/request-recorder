@@ -3,14 +3,34 @@ import fs from 'fs';
 import sqlite3 from 'sqlite3';
 import { open } from 'sqlite';
 import SQL from 'sql-template-strings';
+import defaultConfig from './default-config.json' assert { type: 'json' };
+import configOverrides from './config.json' assert { type: 'json' };
+const config = { ...defaultConfig, ...configOverrides };
 
 const app = express();
 app.use(express.static('public'));
-const port = 80;
+
 const db = await open({
-  filename: 'db/database.db',
+  filename: 'database.db',
   driver: sqlite3.Database
 });
+
+// function importJsonIfExists(filePath) {
+//   try {
+//     if (fs.existsSync(filePath)) {
+//       data = require(filePath);
+//     } else {
+//       data = {};
+//     }
+//   } catch (err) {
+//     console.error(err);
+//   }
+//   return data;
+// }
+
+// const defaultConfig = import
+// const filePath = './default-config.json';
+// const filePath2 = './config.json';
 
 await db.exec(
   `create table if not exists request (id integer primary key, channel text, method text, headers text, query text, body text, timestamp DATETIME DEFAULT CURRENT_TIMESTAMP)`
@@ -48,7 +68,7 @@ app.get('/', (req, res) => {});
 const channelResponder = (req, res) => {
   console.log(req.baseUrl);
   saveRequest(req, req.params.channel);
-  res.send('get success' + req.params.channel);
+  res.send('success ' + req.params.channel);
 };
 
 app.get('/');
@@ -106,6 +126,6 @@ ${val}
 `
   );
 });
-app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`);
+app.listen(config.port, () => {
+  console.log(`Example app listening on port ${config.port}`);
 });
