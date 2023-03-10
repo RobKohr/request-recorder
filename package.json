@@ -1,0 +1,27 @@
+{
+  "name": "request-recorder",
+  "version": "1.0.0",
+  "description": "Takes http request data and dumps them into timestamped files ",
+  "main": "index.js",
+  "scripts": {
+    "start": "pm2 start index.js",
+    "stop": "pm2 stop index; pm2 delete index",
+    "restart": "pm2 restart index",
+    "list": "pm2 list"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RobKohr/request-recorder.git"
+  },
+  "author": "Robert Kohr",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/RobKohr/request-recorder/issues"
+  },
+  "homepage": "https://github.com/RobKohr/request-recorder#readme",
+  "dependencies": {
+    "express": "^4.18.2",
+    "nodemon": "^2.0.21",
+    "pm2": "^5.2.2"
+  }
+}
