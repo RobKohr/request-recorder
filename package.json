@@ -7,7 +7,6 @@
   "scripts": {
     "start": "pm2 start index.js",
     "stop": "pm2 stop index; pm2 delete index",
-    "restart": "pm2 restart index",
     "list": "pm2 list"
   },
   "repository": {
