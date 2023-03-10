@@ -1,0 +1,39 @@
+<html>
+<link rel="stylesheet" type="text/css" href="main.css" />
+<script type="text/javascript" src="main.js"></script>
+
+
+<body>
+    <div id="head">
+        <a href="/">
+            <img src="Rob-burrito_a_reel_to_reel_old_style_recorder_on_the_moon_conne_786624a8-c494-46eb-891a-928b026461c7.png"
+                style="float:left">
+        </a>
+        <div>
+            <h1><a href="/">Request Recorder</a></h1>
+        </div>
+    </div>
+    <div id="content">
+        <p>
+            Request recorder is a tool that gives you a url that you can send web requests to, and it will record the
+            header
+            info, the get query, and the body post to a log.
+        </p>
+        <p>
+            You will then be able to fetch the most recent requests from that log from an accompanying url.
+        </p>
+        <p>
+            <button onclick="generate()">Generate url channel pair</button>
+        </p>
+        <div id="channel-pair">
+            <div>
+                Send requests here: <a href="" id="request-link"></a>
+            </div>
+            <div>
+                See the request log here: <a href="" id="request-log"></a>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

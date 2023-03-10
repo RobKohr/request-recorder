@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Takes http request data and dumps them into timestamped files ",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "start": "pm2 start index.js",
     "stop": "pm2 stop index; pm2 delete index",
@@ -21,7 +22,11 @@
   "homepage": "https://github.com/RobKohr/request-recorder#readme",
   "dependencies": {
     "express": "^4.18.2",
+    "guid": "^0.0.12",
     "nodemon": "^2.0.21",
-    "pm2": "^5.2.2"
+    "pm2": "^5.2.2",
+    "sql-template-strings": "^2.2.2",
+    "sqlite": "^4.1.2",
+    "sqlite3": "^5.1.4"
   }
 }
