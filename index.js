@@ -6,7 +6,7 @@ import SQL from 'sql-template-strings';
 
 const app = express();
 app.use(express.static('public'));
-const port = 3000;
+const port = 80;
 const db = await open({
   filename: 'db/database.db',
   driver: sqlite3.Database
