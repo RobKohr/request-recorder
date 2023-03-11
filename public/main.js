@@ -5,14 +5,16 @@ function randomString(length, chars) {
   return result;
 }
 function generate() {
-  const channel = randomString(6, '23456789ABCDEFGHJKMNOPQRSTUVWXYZ');
+  const channel = randomString(25, '23456789abcdefghjkmnpqrstuvwxyz');
   const baseUrl = window.location.href;
   const request = baseUrl + 'channel/' + channel;
   const log = baseUrl + 'log/' + channel;
   const requestLink = document.getElementById('request-link');
-  const logLink = document.getElementById('request-log');
+    const logLink = document.getElementById('request-log');
+      const form = document.getElementById('request-form');
   requestLink.setAttribute('href', request);
-  logLink.setAttribute('href', log);
+    logLink.setAttribute('href', log);
+    form.setAttribute('action', request);
   requestLink.innerHTML = request;
   logLink.innerHTML = log;
   document.getElementById('channel-pair').style.display = 'block';

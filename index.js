@@ -6,17 +6,21 @@ import SQL from 'sql-template-strings';
 import defaultConfig from './default-config.json' assert { type: 'json' };
 import configOverrides from './config.json' assert { type: 'json' };
 import https from 'https';
+import bodyParser from 'body-parser';
+
 const config = { ...defaultConfig, ...configOverrides };
+
+//setup express app
 const app = express();
 app.use(express.static('public'));
+app.use(bodyParser.urlencoded({ extended: true }));
 
+
+//setup db
 const db = await open({
   filename: 'database.db',
   driver: sqlite3.Database
 });
-
-
-
 await db.exec(
   `create table if not exists request (id integer primary key, channel text, method text, headers text, query text, body text, timestamp DATETIME DEFAULT CURRENT_TIMESTAMP)`
 );
@@ -25,6 +29,7 @@ await db.exec(
   `CREATE INDEX if not exists request_timestamp ON request(timestamp)`
 );
 
+//helper functions
 function json(obj) {
   return JSON.stringify(obj, null, 5);
 }
@@ -38,27 +43,27 @@ function saveRequest(req, channel) {
   );
 }
 
-function prependToFile(str, filepath) {
-  try {
-    const data = fs.readFileSync(filepath, 'utf8');
-    const newData = str + data;
-    fs.writeFileSync(filepath, newData);
-    console.log(`"${str}" was successfully prepended to ${filepath}.`);
-  } catch (err) {
-    console.error(`Error: ${err}`);
-  }
-}
-app.get('/', (req, res) => {});
+let requestTimestamps = [];
+const limitPerMinute = 2;
+function rateLimiter(req, res){
+    const now = Math.round((new Date().getTime())/1000);
+    const oneMinAgo = now - 60
+    if(requestTimestamps.length > limitPerMinute){
+	// get rid of old timestamps
 
+    }
+
+
+    
+}
+
+//respond to post and get messages
 const channelResponder = (req, res) => {
   console.log(req.baseUrl);
   saveRequest(req, req.params.channel);
   res.send('success ' + req.params.channel);
 };
-
-app.get('/');
-app.get('/channel/:channel', channelResponder);
-app.post('/channel/:channel', channelResponder);
+app.all('/channel/:channel', channelResponder);
 app.get('/log/:channel', async (req, res) => {
   const result = await db.all(
     'SELECT * FROM request WHERE channel = ? order by timestamp desc',
