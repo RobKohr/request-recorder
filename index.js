@@ -5,8 +5,8 @@ import { open } from 'sqlite';
 import SQL from 'sql-template-strings';
 import defaultConfig from './default-config.json' assert { type: 'json' };
 import configOverrides from './config.json' assert { type: 'json' };
+import https from 'https';
 const config = { ...defaultConfig, ...configOverrides };
-
 const app = express();
 app.use(express.static('public'));
 
@@ -15,22 +15,7 @@ const db = await open({
   driver: sqlite3.Database
 });
 
-// function importJsonIfExists(filePath) {
-//   try {
-//     if (fs.existsSync(filePath)) {
-//       data = require(filePath);
-//     } else {
-//       data = {};
-//     }
-//   } catch (err) {
-//     console.error(err);
-//   }
-//   return data;
-// }
 
-// const defaultConfig = import
-// const filePath = './default-config.json';
-// const filePath2 = './config.json';
 
 await db.exec(
   `create table if not exists request (id integer primary key, channel text, method text, headers text, query text, body text, timestamp DATETIME DEFAULT CURRENT_TIMESTAMP)`
@@ -129,3 +114,18 @@ ${val}
 app.listen(config.port, () => {
   console.log(`Example app listening on port ${config.port}`);
 });
+
+
+let key = '';
+let cert = '';
+if(config.certLocation){
+    cert = fs.readFileSync(config.certLocation);
+    key = fs.readFileSync(config.keyLocation);
+}
+
+
+if(key){
+     https.createServer({key, cert}, app).listen(443)
+}else{
+    console.log('no ssl key and cert set in config.json');
+}
