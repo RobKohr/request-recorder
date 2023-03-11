@@ -13,7 +13,8 @@ const config = { ...defaultConfig, ...configOverrides };
 //setup express app
 const app = express();
 app.use(express.static('public'));
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json({limit: '1mb'}));
+app.use(bodyParser.urlencoded({limit: '1mb', extended: true}));
 
 //setup db
 const db = await open({
@@ -43,7 +44,7 @@ function saveRequest(req, channel) {
 }
 
 let requestTimestamps = [];
-const limitPerMinute = 2;
+const limitPerMinute = 60;
 function rateLimiter(req, res, next) {
   const now = Math.round(new Date().getTime() / 1000);
   const oneMinAgo = now - 60;
@@ -69,7 +70,7 @@ const channelReceiver = (req, res) => {
 app.all('/channel/:channel', rateLimiter, channelReceiver);
 app.get('/log/:channel', async (req, res) => {
   const result = await db.all(
-    'SELECT * FROM request WHERE channel = ? order by timestamp desc',
+    'SELECT * FROM request WHERE channel = ? order by timestamp desc limit 1000',
     req.params.channel
   );
   const logElementRow = (key, val) => {
