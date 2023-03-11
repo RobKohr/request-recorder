@@ -15,7 +15,6 @@ const app = express();
 app.use(express.static('public'));
 app.use(bodyParser.urlencoded({ extended: true }));
 
-
 //setup db
 const db = await open({
   filename: 'database.db',
@@ -45,25 +44,29 @@ function saveRequest(req, channel) {
 
 let requestTimestamps = [];
 const limitPerMinute = 2;
-function rateLimiter(req, res){
-    const now = Math.round((new Date().getTime())/1000);
-    const oneMinAgo = now - 60
-    if(requestTimestamps.length > limitPerMinute){
-	// get rid of old timestamps
-
-    }
-
-
-    
+function rateLimiter(req, res, next) {
+  const now = Math.round(new Date().getTime() / 1000);
+  const oneMinAgo = now - 60;
+  if (requestTimestamps.length >= limitPerMinute) {
+    // get rid of old timestamps
+    requestTimestamps = requestTimestamps.filter((ts) => ts > oneMinAgo);
+  }
+  if (requestTimestamps.length >= limitPerMinute) {
+    return res
+      .status(503)
+      .send(`Service only accepts at most ${limitPerMinute} requests a minute`);
+  }
+  requestTimestamps.push(now);
+  return next();
 }
 
 //respond to post and get messages
-const channelResponder = (req, res) => {
+const channelReceiver = (req, res) => {
   console.log(req.baseUrl);
   saveRequest(req, req.params.channel);
   res.send('success ' + req.params.channel);
 };
-app.all('/channel/:channel', channelResponder);
+app.all('/channel/:channel', rateLimiter, channelReceiver);
 app.get('/log/:channel', async (req, res) => {
   const result = await db.all(
     'SELECT * FROM request WHERE channel = ? order by timestamp desc',
@@ -120,17 +123,15 @@ app.listen(config.port, () => {
   console.log(`Example app listening on port ${config.port}`);
 });
 
-
 let key = '';
 let cert = '';
-if(config.certLocation){
-    cert = fs.readFileSync(config.certLocation);
-    key = fs.readFileSync(config.keyLocation);
+if (config.certLocation) {
+  cert = fs.readFileSync(config.certLocation);
+  key = fs.readFileSync(config.keyLocation);
 }
 
-
-if(key){
-     https.createServer({key, cert}, app).listen(443)
-}else{
-    console.log('no ssl key and cert set in config.json');
+if (key) {
+  https.createServer({ key, cert }, app).listen(443);
+} else {
+  console.log('no ssl key and cert set in config.json');
 }
