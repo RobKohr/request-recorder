@@ -26,3 +26,5 @@ npm run list # see if it is currently running
 - [ ] limit how many writes per channel
 - [ ] delete old writes
 - [ ] Some simple payment system to get more write access
+
+In the current state, this is best run on a small server with no other services on it that would not be tragic to overrun as there are no controls.
