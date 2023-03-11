@@ -8,6 +8,8 @@ You will then be able to fetch the most recent requests from that log from an ac
 A hosted example is up at:
 [http://request-recorder.neverall.com/](http://request-recorder.neverall.com/)
 
+Data is recorded in an sqlite3db
+
 ## Usage
 
 ```bash
@@ -17,3 +19,10 @@ npm start # this starts it in pm2 so it will run as a background process on your
 npm run stop # to kill the process
 npm run list # see if it is currently running
 ```
+
+## To Dos
+
+- [ ] Throttle writes to not overload the db
+- [ ] limit how many writes per channel
+- [ ] delete old writes
+- [ ] Some simple payment system to get more write access
