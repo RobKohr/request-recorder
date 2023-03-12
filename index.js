@@ -7,14 +7,14 @@ import defaultConfig from './default-config.json' assert { type: 'json' };
 import configOverrides from './config.json' assert { type: 'json' };
 import https from 'https';
 import bodyParser from 'body-parser';
-
+import { encode } from 'html-entities';
 const config = { ...defaultConfig, ...configOverrides };
 
 //setup express app
 const app = express();
 app.use(express.static('public'));
-app.use(bodyParser.json({limit: '1mb'}));
-app.use(bodyParser.urlencoded({limit: '1mb', extended: true}));
+app.use(bodyParser.json({ limit: '1mb' }));
+app.use(bodyParser.urlencoded({ limit: '1mb', extended: true }));
 
 //setup db
 const db = await open({
@@ -80,7 +80,7 @@ app.get('/log/:channel', async (req, res) => {
             ${key}
         </div>
         <pre class="log-element-cell log-element-val">
-${val}
+${encode(val)}
         </pre>
     </div>
     `;

@@ -22,9 +22,10 @@ npm run list # see if it is currently running
 
 ## To Dos
 
-- [ ] Throttle writes to not overload the db
+- [x] Throttle writes to not overload the db
 - [ ] limit how many writes per channel
 - [ ] delete old writes
 - [ ] Some simple payment system to get more write access
 
-In the current state, this is best run on a small server with no other services on it that would not be tragic to overrun as there are no controls.
+This app is fairly dangerous to run on a server with other services. It liberally accepts requests and writes them to an sqlite db. It then allows you to read
+the 1000 most recent log messages for a channel. Also no security exists to
