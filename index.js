@@ -28,6 +28,11 @@ await db.exec(`CREATE INDEX if not exists request_channel ON request(channel)`);
 await db.exec(
   `CREATE INDEX if not exists request_timestamp ON request(timestamp)`
 );
+try {
+  await db.exec(`alter table request add column ipAddress text`);
+} catch (e) {
+  //ignore
+}
 
 //helper functions
 function json(obj) {
@@ -38,8 +43,10 @@ function saveRequest(req, channel) {
   const headers = json(req.headers);
   const query = json(req.query);
   const body = json(req.body);
+  const ipAddress = req.ip;
+
   db.run(
-    SQL`Insert into request (channel, method, headers, query, body ) values (${channel}, ${method}, ${headers}, ${query}, ${body} ) `
+    SQL`Insert into request (channel, method, headers, query, body, ipAddress ) values (${channel}, ${method}, ${headers}, ${query}, ${body}, ${ipAddress}) `
   );
 }
 
@@ -64,14 +71,18 @@ function rateLimiter(req, res, next) {
 //respond to post and get messages
 const channelReceiver = (req, res) => {
   console.log(req.baseUrl);
-  saveRequest(req, req.params.channel);
-  res.send('success ' + req.params.channel);
+  const channel = req.params.channel;
+  saveRequest(req, channel);
+  res.send(
+    `successfully logged to ${channel}. View log at <a href="/log/${channel}">/log/${channel}</a>`
+  );
 };
 app.all('/channel/:channel', rateLimiter, channelReceiver);
 app.get('/log/:channel', async (req, res) => {
+  const channel = req.params.channel;
   const result = await db.all(
     'SELECT * FROM request WHERE channel = ? order by timestamp desc limit 1000',
-    req.params.channel
+    channel
   );
   const logElementRow = (key, val) => {
     return `
@@ -92,6 +103,7 @@ ${encode(val)}
             ${logElementRow('timestamp', row.timestamp)}
             ${logElementRow('method', row.method)}
             ${logElementRow('headers', row.headers)}
+            ${logElementRow('ipAddress', row.ipAddress)}
             ${logElementRow('query', row.query)}
             ${logElementRow('body', row.body)}
         </div>    
@@ -113,7 +125,20 @@ ${encode(val)}
         </div>
     </div>
     <div id="content">
-    <h2>Log for ${req.params.channel}</h2>
+    <h4>Simulate a post in a new tab to request url</h4>
+    <form method="post" target="_blank" action="${
+      '/channel/' + channel
+    }" id="request-form">
+        <div>
+            <input name="testField" placeholder="Enter a value for testField" />
+        </div>
+        <div>
+            <input type="submit" />
+        </div>
+    </form>
+<hr>
+
+    <h2>Log for ${encode(req.params.channel)}</h2>
     ${logContent}
     </div>
 </html>
